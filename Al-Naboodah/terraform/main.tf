@@ -1,13 +1,14 @@
 locals {
-    project_name = "3-tier-app"
+    project_name = "Al-Naboodah"
     region       = "us-west-2"
     vpc_cidr     = "10.0.0.0/16"
     env = "dev"
+    directory_name = "corp.notexample.com"
 }
 provider "aws" {
   region=local.region 
    shared_credentials_files = ["C:/Users/moham/.aws/credentials"]
-   profile = "vscode" 
+   profile = "ICS" 
    
 }
 module "networking" {
@@ -20,4 +21,19 @@ module "networking" {
     Environment = local.env
   }
   
+}
+resource "aws_directory_service_directory" "Al-Naboodah_directory" {
+  name     = local.directory_name
+  password = "SuperSecretPassw0rd"
+  edition  = "Standard"
+  type     = "MicrosoftAD"
+
+  vpc_settings {
+    vpc_id     = aws_vpc.main.id
+    subnet_ids = module.networking.private_subnet_ids
+  }
+
+  tags = {
+    Project = local.project_name
+  }
 }
